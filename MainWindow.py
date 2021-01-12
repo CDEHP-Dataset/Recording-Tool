@@ -18,7 +18,7 @@ class MainWindow(QtWidgets.QDialog):
     signal_color_image = QtCore.pyqtSignal(object, name="color_image")
     signal_event_snapshot = QtCore.pyqtSignal(object, name="event_snapshot")
 
-    def __init__(self, args, controller, parent=None, width = 820, height=720):
+    def __init__(self, args, controller, parent=None, width=1020, height=720):
         super(MainWindow, self).__init__(parent)
         
         self.args = args
@@ -59,9 +59,7 @@ class MainWindow(QtWidgets.QDialog):
         font = QtGui.QFont()
         font.setPointSize(18)
 
-        right_column_x = 320 * 2 + 10
-
-        self.setFixedSize(1020, 720)
+        right_column_x = 320 * 2 + 30
 
         self.status = QtWidgets.QLabel(self)
         self.status.setGeometry(50,20,250,30)

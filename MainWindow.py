@@ -18,7 +18,7 @@ class MainWindow(QtWidgets.QDialog):
     signal_color_image = QtCore.pyqtSignal(object, name="color_image")
     signal_event_snapshot = QtCore.pyqtSignal(object, name="event_snapshot")
 
-    def __init__(self, args, controller, parent=None, width=1020, height=720):
+    def __init__(self, args, controller, parent=None, width=1020, height=480):
         super(MainWindow, self).__init__(parent)
         
         self.args = args
@@ -82,40 +82,44 @@ class MainWindow(QtWidgets.QDialog):
         self.person_state.setFont(font)
 
         button_group_y = 250
+        button_width = (self.width - right_column_x - 3 * margin) // 2
+        column_width = button_width + margin
+        row_height = 80
+        button_x = right_column_x + margin
 
         self.btn_action_plus = QtWidgets.QPushButton(self)
         self.btn_action_plus.setText('A ++')
-        self.btn_action_plus.setGeometry(right_column_x + 150, button_group_y, 100, 60)
+        self.btn_action_plus.setGeometry(button_x + column_width, button_group_y, button_width, 60)
         self.btn_action_plus.setFont(font)
         self.btn_action_plus.clicked.connect(self.btn_action_plus_click)
 
         self.btn_action_sub = QtWidgets.QPushButton(self)
         self.btn_action_sub.setText('A --')
-        self.btn_action_sub.setGeometry(right_column_x, button_group_y, 100, 60)
+        self.btn_action_sub.setGeometry(button_x, button_group_y, button_width, 60)
         self.btn_action_sub.setFont(font)
         self.btn_action_sub.clicked.connect(self.btn_action_sub_click)
 
         self.btn_person_plus = QtWidgets.QPushButton(self)
         self.btn_person_plus.setText('P ++')
-        self.btn_person_plus.setGeometry(right_column_x + 150, button_group_y + 100, 100, 60)
+        self.btn_person_plus.setGeometry(button_x + column_width, button_group_y + row_height, button_width, 60)
         self.btn_person_plus.setFont(font)
         self.btn_person_plus.clicked.connect(self.btn_person_plus_click)
 
         self.btn_person_sub = QtWidgets.QPushButton(self)
         self.btn_person_sub.setText('P --')
-        self.btn_person_sub.setGeometry(right_column_x, button_group_y + 100, 100, 60)
+        self.btn_person_sub.setGeometry(button_x, button_group_y + row_height, button_width, 60)
         self.btn_person_sub.setFont(font)
         self.btn_person_sub.clicked.connect(self.btn_person_sub_click)
 
         self.btn_record = QtWidgets.QPushButton(self)
         self.btn_record.setText('Record')
-        self.btn_record.setGeometry(100, self.height-100, 300, 60)
+        self.btn_record.setGeometry(button_x, button_group_y + row_height * 2, button_width, 60)
         self.btn_record.setFont(font)
         self.btn_record.clicked.connect(self.btn_record_click)
 
         self.btn_cancel = QtWidgets.QPushButton(self)
         self.btn_cancel.setText('Cancel')
-        self.btn_cancel.setGeometry(QtCore.QRect(self.width-300-margin, self.height-margin, 300, 60))
+        self.btn_cancel.setGeometry(QtCore.QRect(button_x + column_width, button_group_y + row_height * 2, button_width, 60))
         self.btn_cancel.setFont(font)
         self.btn_cancel.clicked.connect(self.btn_cancel_click)
 

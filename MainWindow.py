@@ -49,7 +49,7 @@ class MainWindow(QtWidgets.QDialog):
     def display_log(self, size):
         self.queue_state.setText('Write Queue Size = {}'.format(size))
 
-    def initUI(self, margin=100):
+    def initUI(self, margin=30):
         self.rs_color_frame = QtWidgets.QLabel(self)
         self.rs_color_frame.setGeometry(0, 0, 320, 480)
         
@@ -59,7 +59,7 @@ class MainWindow(QtWidgets.QDialog):
         font = QtGui.QFont()
         font.setPointSize(18)
 
-        right_column_x = 320 * 2 + 30
+        right_column_x = 320 * 2 + margin
 
         self.status = QtWidgets.QLabel(self)
         self.status.setGeometry(right_column_x,20,250,30)

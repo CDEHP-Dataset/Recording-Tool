@@ -382,6 +382,9 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
             cv2.imwrite(os.path.join(path_write, '{:06d}.png'.format(i)), modal_data[i])
 
 
+class EventCameraError(Exception): pass
+
+
 class EventReader(Runnable, ReaderCallback, Readable):
     
     def __init__(self, args, controller: RecorderController):
@@ -389,8 +392,11 @@ class EventReader(Runnable, ReaderCallback, Readable):
         self.controller = controller
 
         self.evnet_queue = queue.Queue()
-        self.event_dev = pycx.pyCeleX5()
-        
+        try:
+            self.event_dev = pycx.pyCeleX5()
+        except Exception:
+            raise EventCameraError
+
         self.current_record = None
         
         self.is_recording = False
@@ -492,7 +498,7 @@ def main():
         print("")
         event_reader = EventReader(args, controller)
         print("[info] Event camera opened.")
-    except EventError:
+    except EventCameraError:
         rs_reader.stop()
         writer.stop()
         controller.stop()

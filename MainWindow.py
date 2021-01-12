@@ -161,10 +161,12 @@ class MainWindow(QtWidgets.QDialog):
 
     def btn_record_click(self):
         if self.controller.is_recording:
+            print("=" * 20, "save button clicked")
             self.controller.set_stop()
             self.status.setText('Idle')
             self.btn_record.setText('Record')
         else:
+            print("=" * 20, "record button clicked")
             self.controller.set_record()
             self.status.setText('Recording')
             self.btn_record.setText('Save')
@@ -182,7 +184,7 @@ class MainWindow(QtWidgets.QDialog):
     def btn_cancel_click(self):
         if not self.controller.is_recording:
             return
-        
+        print("=" * 20, "cancel button clicked")
         self.controller.set_cancel()
         self.status.setText('Idle')
         self.btn_record.setText('Record')

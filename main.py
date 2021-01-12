@@ -36,8 +36,8 @@ def parse_args():
     return par.parse_args()
 
 
-def random_string():
-    return "".join("{:02x}".format(x) for x in os.urandom(5))
+def random_string(l):
+    return "".join("{:02x}".format(x) for x in os.urandom(l))
 
 
 class WriteInfo:
@@ -215,12 +215,15 @@ class RecorderController(Runnable):
 class ReaderCallback:
 
     def notify_record(self):
+        print("default record callback handler called on", self)
         pass
 
     def notify_save(self, aid, pid):
+        print("default save callback handler called on", self)
         pass
 
     def notify_cancel(self):
+        print("default cancel callback handler called on", self)
         pass
 
 
@@ -236,39 +239,46 @@ class WriteProcedure(Runnable, ReaderCallback):
         self.window = w
 
     def register_readable(self, r):
+        print("writer: registering readable:", r)
         self.readables.append(r)
 
     def notify_save(self, aid, pid):
+        print("writer notified to saving")
         self.pending_jobs.put((aid, pid))
 
     def proc(self):
     
         while self.working:
 
-            if not all(r.poll(timeout=0.1) for r in self.readables):
+            if len(self.readables) <= 0 or not all([r.poll() for r in self.readables]):
                 time.sleep(0.1)
                 continue
             
+            print("writer: exit from poll loop")
             multi_modal_stream = []
             for r in self.readables:
+                print("writer: reading from:", r, "...")
                 multi_modal_stream.extend(r.read())
 
             aid, pid = self.pending_jobs.get()
-
+            print("Writer: start saving:", aid, pid)
             path_write = os.path.join(self.args.path, "A{:04d}P{:04d}".format(aid, pid))
             os.makedirs(path_write, exist_ok=True)
             
             root_path, sub_dirs, sub_files = next(os.walk(path_write))
             path_write = os.path.join(path_write, 'S{:02d}'.format(len(sub_dirs)))
-
+            
+            print("number of modals:", len(multi_modal_stream))
+            
             for each in multi_modal_stream:
                 modal_name, f_save, modal_data = each
                 modal_path = os.path.join(path_write, modal_name)
                 os.makedirs(modal_path, exist_ok=True)
+                print("calling save function:", modal_path)
                 f_save(modal_path, modal_data)
 
             if self.window:
-                self.window.signal_queue_size.emit(self.q.qsize())
+                self.window.signal_queue_size.emit(self.pending_jobs.qsize())
 
 
 # class FakeRS():
@@ -300,9 +310,11 @@ class WriteProcedure(Runnable, ReaderCallback):
 class Readable:
 
     def poll(self):
+        raise NotImplementedError
         return False
 
     def read(self):
+        raise NotImplementedError
         return None
 
 
@@ -326,23 +338,28 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
         self.window = w
 
     def notify_record(self):
+        print("rs_reader notified to recording")
         self.is_recording = True
 
     def notify_save(self, aid, pid):
-        self.is_recording = False
-        self.save_signal = False
-
-    def notify_cancel(self):
+        print("rs_reader notified to saving")
         self.is_recording = False
         self.save_signal = True
+        self.cancel_signal = False
 
+    def notify_cancel(self):
+        print("rs_reader notified to cancelling")
+        self.is_recording = False
+        self.save_signal = False
+        self.cancel_signal = True
+        
     def proc(self):
         writeInfo = WriteInfo(self.controller.aid, self.controller.pid)
         
         while self.working:
         
             rs_color_frame, rs_color_frame_show, rs_depth_frame = self.realsense.get_frame()
-            rs_color_frame_show = cv2.rotate(rs_color_frame_show, cv2.ROTATE_90_CLOCKWISE)
+            rs_color_frame_show = cv2.rotate(rs_color_frame_show, cv2.ROTATE_90_COUNTERCLOCKWISE)
             color_img = QtGui.QImage(rs_color_frame_show.data, rs_color_frame_show.shape[1],rs_color_frame_show.shape[0], QtGui.QImage.Format_RGB888)
             
             if self.window:
@@ -355,6 +372,7 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
                 if self.save_signal:
                     writeInfo.setActionID(self.controller.aid)
                     writeInfo.setPeopleID(self.controller.pid)
+                    print("rs_reader: a writeInfo is pushed into image_queue")
                     self.image_queue.put(writeInfo)
                     
                     if self.window:
@@ -367,19 +385,21 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
                     writeInfo = WriteInfo(self.controller.aid, self.controller.pid)
 
     def poll(self):
-        return not self.image_queue.empty()
+        v = self.image_queue.qsize() > 0
+        return v
 
     def read(self):
         job = self.image_queue.get(block=False)
-
+        print("realsense reader: returning save job:", len(job.frames_color), len(job.frames_depth))
         return [
             ("color", self.save_data, job.frames_color),
             ("depth", self.save_data, job.frames_depth)
         ]
     
     def save_data(self, modal_path, modal_data):
+        print("realsense reader: saving job ...", modal_path)
         for i in range(len(modal_data)):
-            cv2.imwrite(os.path.join(path_write, '{:06d}.png'.format(i)), modal_data[i])
+            cv2.imwrite(os.path.join(modal_path, '{:06d}.png'.format(i)), modal_data[i])
 
 
 class EventCameraError(Exception): pass
@@ -391,7 +411,7 @@ class EventReader(Runnable, ReaderCallback, Readable):
         super(EventReader, self).__init__(args)
         self.controller = controller
 
-        self.evnet_queue = queue.Queue()
+        self.event_queue = queue.Queue()
         try:
             self.event_dev = pycx.pyCeleX5()
         except Exception:
@@ -409,28 +429,37 @@ class EventReader(Runnable, ReaderCallback, Readable):
 
     def notify_record(self):
         if self.is_recording:
+            print("event_reader notified to recording, but it is recording already.")
             return
+        print("event_reader notified to recording")
         self.current_record = os.path.join(self.args.path, ".event_stream.{}".format(random_string(5)))
         self.event_dev.startRecording(self.current_record)
+        self.is_recording = True
 
     def notify_save(self, aid, pid):
         if not self.is_recording:
+            print("event_reader notified to saving, but it is not in recording mode.")
             return
 
+        print("event_reader notified to saving")
         self.event_dev.stopRecording()
         self.event_queue.put((
             "event_stream", 
             self.save_event, 
             (self.current_record,)
         ))
+        self.is_recording = False
         self.current_record = None
 
     def notify_cancel(self):
+        print("event_reader notified to cancelling")
         if not self.is_recording:
+            print("event_reader notified to saving, but it is not in recording mode.")
             return
-
+        
         self.event_dev.stopRecording()
         os.remove(self.current_record)
+        self.is_recording = False
         self.current_record = None
 
     def proc(self):
@@ -438,6 +467,9 @@ class EventReader(Runnable, ReaderCallback, Readable):
             if self.window:
                 EVENT_BINARY_PIC = 0
                 img = self.event_dev.getEventPicBuffer(EVENT_BINARY_PIC)
+                img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+                img = cv2.resize(img, (300, 480))
+                img = np.ascontiguousarray(img[:, ::-1])
                 color_img = QtGui.QImage(img.data, img.shape[1],img.shape[0], QtGui.QImage.Format_Grayscale8)
 
                 self.window.signal_event_snapshot.emit(color_img)
@@ -445,12 +477,16 @@ class EventReader(Runnable, ReaderCallback, Readable):
             time.sleep(0.01)
 
     def poll(self):
-        return not self.event_queue.empty()
+        v = self.event_queue.qsize() > 0
+        return v
 
     def read(self):
-        job = self.image_queue.get(block=False)
+        print("event reader: returning job ...")
+        job = [self.event_queue.get(block=False)]
+        return job
 
     def save_event(self, modal_path, modal_data):
+        print("event reader: saving job ...", modal_path)
         shutil.move(modal_data[0], os.path.join(modal_path, "EventStream.bin"))
 
 
@@ -507,10 +543,12 @@ def main():
 
     rs_reader.register_window(window)
     rs_reader.start()
+    writer.register_readable(rs_reader)
     
     event_reader.register_window(window)
     event_reader.start()
-    
+    writer.register_readable(event_reader)
+
     while True:
         try:
             app.processEvents()

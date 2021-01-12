@@ -61,6 +61,8 @@ class MainWindow(QtWidgets.QDialog):
 
         right_column_x = 320 * 2 + 10
 
+        self.setFixedSize(1020, 720)
+
         self.status = QtWidgets.QLabel(self)
         self.status.setGeometry(50,20,250,30)
         self.status.setText('Idle')

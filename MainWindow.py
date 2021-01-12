@@ -39,9 +39,6 @@ class MainWindow(QtWidgets.QDialog):
         self.signal_color_image.connect(self.display_realsense)
         self.signal_event_snapshot.connect(self.display_eventstream)
         self.signal_status_update.connect(self.update_status)
-
-        self.rs_color_frame = None
-        self.event_frame = None
         
     def display_realsense(self, color_frame):
         self.rs_color_frame.setPixmap(QtGui.QPixmap.fromImage(color_frame))

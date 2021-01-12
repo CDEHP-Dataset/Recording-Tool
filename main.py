@@ -17,6 +17,7 @@ import numpy as np
 
 
 from sensor import RealSense, RealSenseError
+import pyCeleX5 as pycx
 
 
 def parse_args():
@@ -96,7 +97,7 @@ class RecorderController(Runnable):
 
     def register_window(self, w):
         self.window = w
-
+    
     @property
     def aid(self):
         return self._aid
@@ -323,6 +324,59 @@ class RealsenseReader(Runnable):
             self.controller.is_recording = False
 
 
+class EventReader(Runnable):
+    
+    def __init__(self, args, event_queue, controller: RecorderController):
+        super(RealsenseReader, self).__init__(args)
+        self.evnet_queue = event_queue
+        self.eventdev = pycx.pyCeleX5()
+        self.is_recording = False
+    
+    def register_window(self, w):
+        self.window = w
+
+    def proc(self):
+        writeInfo = WriteInfo(self.controller.aid, self.controller.pid)
+        
+        while self.working:
+
+            rs_color_frame, rs_color_frame_show, rs_depth_frame = self.realsense.get_frame()
+            rs_color_frame_show = cv2.rotate(rs_color_frame_show, cv2.ROTATE_90_CLOCKWISE)
+            color_img = QtGui.QImage(rs_color_frame_show.data, rs_color_frame_show.shape[1],rs_color_frame_show.shape[0], QtGui.QImage.Format_RGB888)
+            
+            if self.window:
+                self.window.signal_color_image.emit(color_img)
+
+            if self.controller.is_recording and not self.is_recording:
+                self.is_recording = True
+                self.eventdev.startRecording(path, "xxx")
+            else:
+                if self.controller.save:
+                    writeInfo.setActionID(self.controller.aid)
+                    writeInfo.setPeopleID(self.controller.pid)
+                    self.image_queue.put(writeInfo)
+                    
+                    if self.window:
+                        self.window.signal_queue_size.emit(self.image_queue.qsize())
+                    
+                if self.controller.save or self.controller.canceled:
+                    self.controller.save = False
+                    self.controller.canceled = False
+                    self.controller.is_recording = False
+                    writeInfo = WriteInfo(self.controller.aid, self.controller.pid)
+        
+        if self.controller.is_recording:
+            # if still recording when quitting:
+            # save the buffer into failsave location.
+            
+            writeInfo.setActionID(-1)
+            writeInfo.setPeopleID(-1)
+            self.image_queue.put(writeInfo)
+            self.controller.save = False
+            self.controller.canceled = False
+            self.controller.is_recording = False
+
+
 def main():
 
     args = parse_args()
@@ -359,10 +413,19 @@ def main():
         writer.stop()
         controller.stop()
         exit(-1)
+	
+    try:
+        print("")
+        event_reader = EventReader(args, )
+    except EventError:
+        w
 
     rs_reader.register_window(window)
     rs_reader.start()
-
+    
+    event_reader.register_window(window)
+    event_reader.start()
+    
     while True:
         try:
             app.processEvents()

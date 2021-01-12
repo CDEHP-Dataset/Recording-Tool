@@ -38,7 +38,7 @@ class MainWindow(QtWidgets.QDialog):
         
         self.signal_id_update.connect(self.update_ids)
         self.signal_color_image.connect(self.display_realsense)
-        self.signal_event_snapshot.fconnect(self.display_eventstream)
+        self.signal_event_snapshot.connect(self.display_eventstream)
         self.signal_status_update.connect(self.update_status)
 
         self.rs_color_frame = None

@@ -468,12 +468,14 @@ def main():
         controller.start()
 
     writer = WriteProcedure(args, controller)
-    writer.register_window(window)
     writer.start()
 
     app = QApplication([""])
     window = MainWindow(args, image_queue, controller)
+    
+    writer.register_window(window)
     controller.register_window(window)
+    
     window.show()
 
     try:

@@ -1,7 +1,9 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QApplication
+
 from MainWindow import MainWindow
 import sys
-# from wirter import  *
+
 import threading
 import argparse
 import os
@@ -108,7 +110,7 @@ class RecorderController(Runnable):
             self.network_controller.notify_update()
 
         if self.window:
-            self.window.emit(QtCore.SIGNAL("id_update"))
+            self.window.signal_id_update.emit()
 
     @property
     def pid(self):
@@ -123,7 +125,7 @@ class RecorderController(Runnable):
             self.network_controller.notify_update()
 
         if self.window:
-            self.window.emit(QtCore.SIGNAL("id_update"))
+            self.window.signal_id_update.emit()
 
     @property
     def sid(self):
@@ -137,7 +139,7 @@ class RecorderController(Runnable):
             self.network_controller.notify_update()
 
         if self.window:
-            self.window.emit(QtCore.SIGNAL("id_update"))
+            self.window.signal_id_update.emit()
 
     def listen_for_sync(self):
         while self.working:
@@ -167,7 +169,10 @@ class RecorderController(Runnable):
             self.is_recording = True
             self.save = False
             self.canceled = False
-
+            
+            if self.window:
+                self.window.signal_status_update.emit()
+                
             if self.args.master:
                 self.network_controller.notify_start()
 
@@ -176,7 +181,10 @@ class RecorderController(Runnable):
             self.is_recording = False
             self.save = True
             self.canceled = False
-
+            
+            if self.window:
+                self.window.signal_status_update.emit()
+                
             if self.args.master:
                 self.network_controller.notify_stop()
 
@@ -185,7 +193,10 @@ class RecorderController(Runnable):
             self.is_recording = False
             self.canceled = True
             self.save = False
-
+            
+            if self.window:
+                self.window.signal_status_update.emit()
+                
             if self.args.master:
                 self.network_controller.notify_cancel()
 
@@ -221,9 +232,9 @@ class WriteProcedure(Runnable):
             for i in range(len(job.frames_color)):
                 cv2.imwrite(os.path.join(path_write, "color", '{:06d}.png'.format(i)), job.frames_color[i])
                 cv2.imwrite(os.path.join(path_write, "depth", '{:06d}.png'.format(i)), job.frames_depth[i])
-            
+
             if self.window:
-                self.window.emit(QtCore.SIGNAL("queue_size"), self.q.qsize())
+                self.window.signal_queue_size.emit(self.q.qsize())
 
 
 # class FakeRS():
@@ -280,7 +291,7 @@ class RealsenseReader(Runnable):
             color_img = QtGui.QImage(rs_color_frame_show.data, rs_color_frame_show.shape[1],rs_color_frame_show.shape[0], QtGui.QImage.Format_RGB888)
             
             if self.window:
-                self.window.emit(QtCore.SIGNAL("color_image"), color_img)
+                self.window.signal_color_image.emit(color_img)
 
             if self.controller.is_recording:
                 writeInfo.frames_color.append(rs_color_frame.copy())
@@ -292,7 +303,7 @@ class RealsenseReader(Runnable):
                     self.image_queue.put(writeInfo)
                     
                     if self.window:
-                        self.window.emit(QtCore.SIGNAL("queue_size"), self.image_queue.qsize())
+                        self.window.signal_queue_size.emit(self.image_queue.qsize())
                     
                 if self.controller.save or self.controller.canceled:
                     self.controller.save = False
@@ -331,11 +342,10 @@ def main():
     if not args.master:
         controller.start()
 
-    app = QtGui.QApplication([""])
+    app = QApplication([""])
     window = MainWindow(args, image_queue, controller)
     controller.register_window(window)
     window.show()
-    window.connect(window, QtCore.SIGNAL("id_update"), window.update_ids)
 
     writer = WriteProcedure(args, image_queue)
     writer.register_window(window)
@@ -351,7 +361,6 @@ def main():
         exit(-1)
 
     rs_reader.register_window(window)
-    window.connect(window, QtCore.SIGNAL("color_image"), window.display_realsense)
     rs_reader.start()
 
     while True:

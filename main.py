@@ -303,7 +303,7 @@ class Readable:
         return False
 
     def read(self):
-        return None
+        return [None]
 
 
 class RealsenseReader(Runnable, ReaderCallback, Readable):
@@ -448,7 +448,7 @@ class EventReader(Runnable, ReaderCallback, Readable):
         return not self.event_queue.empty()
 
     def read(self):
-        job = self.image_queue.get(block=False)
+        job = [self.image_queue.get(block=False)]
 
     def save_event(self, modal_path, modal_data):
         shutil.move(modal_data[0], os.path.join(modal_path, "EventStream.bin"))

@@ -82,10 +82,10 @@ class MainWindow(QtWidgets.QDialog):
         self.person_state.setFont(font)
 
         button_group_y = 250
-        button_width = (self.width - right_column_x - 3 * margin) // 2
+        button_width = (self.width - right_column_x - 2 * margin) // 2
         column_width = button_width + margin
         row_height = 80
-        button_x = right_column_x + margin
+        button_x = right_column_x
 
         self.btn_action_plus = QtWidgets.QPushButton(self)
         self.btn_action_plus.setText('A ++')

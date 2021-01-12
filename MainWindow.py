@@ -59,53 +59,55 @@ class MainWindow(QtWidgets.QDialog):
         font = QtGui.QFont()
         font.setPointSize(18)
 
+        right_column_x = 320 * 2 + 10
+
         self.status = QtWidgets.QLabel(self)
         self.status.setGeometry(50,20,250,30)
         self.status.setText('Idle')
         self.status.setFont(font)
 
         self.queue_state = QtWidgets.QLabel(self)
-        self.queue_state.setGeometry(450,20,250,30)
+        self.queue_state.setGeometry(right_column_x,20,300,30)
         self.queue_state.setText('Write Queue Size = 0')
         self.queue_state.setFont(font)
 
         self.action_state = QtWidgets.QLabel(self)
-        self.action_state.setGeometry(450,60,250,30)
+        self.action_state.setGeometry(right_column_x,60,250,30)
         self.action_state.setText('Current Action = 0')
         self.action_state.setFont(font)
 
         self.person_state = QtWidgets.QLabel(self)
-        self.person_state.setGeometry(450,100,250,30)
+        self.person_state.setGeometry(right_column_x,100,250,30)
         self.person_state.setText('Current Person = 0')
         self.person_state.setFont(font)
 
         self.btn_action_plus = QtWidgets.QPushButton(self)
         self.btn_action_plus.setText('A ++')
-        self.btn_action_plus.setGeometry(QtCore.QRect(600, 200, 100, 60))
+        self.btn_action_plus.setGeometry(right_column_x + 150, 200, 100, 60)
         self.btn_action_plus.setFont(font)
         self.btn_action_plus.clicked.connect(self.btn_action_plus_click)
 
         self.btn_action_sub = QtWidgets.QPushButton(self)
         self.btn_action_sub.setText('A --')
-        self.btn_action_sub.setGeometry(QtCore.QRect(450, 200, 100, 60))
+        self.btn_action_sub.setGeometry(right_column_x, 200, 100, 60)
         self.btn_action_sub.setFont(font)
         self.btn_action_sub.clicked.connect(self.btn_action_sub_click)
 
         self.btn_person_plus = QtWidgets.QPushButton(self)
         self.btn_person_plus.setText('P ++')
-        self.btn_person_plus.setGeometry(QtCore.QRect(600, 300, 100, 60))
+        self.btn_person_plus.setGeometry(right_column_x + 150, 300, 100, 60)
         self.btn_person_plus.setFont(font)
         self.btn_person_plus.clicked.connect(self.btn_person_plus_click)
 
         self.btn_person_sub = QtWidgets.QPushButton(self)
         self.btn_person_sub.setText('P --')
-        self.btn_person_sub.setGeometry(QtCore.QRect(450, 300, 100, 60))
+        self.btn_person_sub.setGeometry(right_column_x, 300, 100, 60)
         self.btn_person_sub.setFont(font)
         self.btn_person_sub.clicked.connect(self.btn_person_sub_click)
 
         self.btn_record = QtWidgets.QPushButton(self)
         self.btn_record.setText('Record')
-        self.btn_record.setGeometry(QtCore.QRect(100, self.height-100, 300, 60))
+        self.btn_record.setGeometry(100, self.height-100, 300, 60)
         self.btn_record.setFont(font)
         self.btn_record.clicked.connect(self.btn_record_click)
 

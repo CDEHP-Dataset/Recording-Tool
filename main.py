@@ -523,6 +523,7 @@ def main():
             break
 
     rs_reader.stop()
+    event_reader.stop()
     writer.stop()
     controller.stop()
 

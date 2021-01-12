@@ -315,7 +315,6 @@ class Readable:
 
     def read(self):
         raise NotImplementedError
-        return None
 
 
 class RealsenseReader(Runnable, ReaderCallback, Readable):

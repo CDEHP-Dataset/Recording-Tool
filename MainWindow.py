@@ -16,7 +16,8 @@ class MainWindow(QtWidgets.QDialog):
     signal_id_update = QtCore.pyqtSignal(name="id_update")
     signal_status_update = QtCore.pyqtSignal(name="status_update")
     signal_color_image = QtCore.pyqtSignal(object, name="color_image")
-    
+    signal_event_snapshot = QtCore.pyqtSignal(object, name="event_snapshot")
+
     def __init__(self, args, image_queue, controller, parent=None, width = 820, height=720):
         super(MainWindow, self).__init__(parent)
         
@@ -37,17 +38,27 @@ class MainWindow(QtWidgets.QDialog):
         
         self.signal_id_update.connect(self.update_ids)
         self.signal_color_image.connect(self.display_realsense)
+        self.signal_event_snapshot.fconnect(self.display_eventstream)
         self.signal_status_update.connect(self.update_status)
+
+        self.rs_color_frame = None
+        self.event_frame = None
         
     def display_realsense(self, color_frame):
         self.rs_color_frame.setPixmap(QtGui.QPixmap.fromImage(color_frame))
+
+    def display_eventstream(self, event_frame):
+        self.event_frame.setPixmap(QtGui.QPixmap.fromImage(event_frame))
 
     def display_log(self, size):
         self.queue_state.setText('Write Queue Size = {}'.format(size))
 
     def initUI(self, margin=100):
         self.rs_color_frame = QtWidgets.QLabel(self)
-        self.rs_color_frame.setGeometry(50, 60, 320, 480)
+        self.rs_color_frame.setGeometry(0, 60, 320, 480)
+        
+        self.event_frame = QtWidgets.QLabel(self)
+        self.event_frame.setGeometry(320, 60, 320, 480)
 
         font = QtGui.QFont()
         font.setPointSize(18)

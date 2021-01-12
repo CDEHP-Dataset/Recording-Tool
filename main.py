@@ -471,7 +471,7 @@ def main():
     writer.start()
 
     app = QApplication([""])
-    window = MainWindow(args, image_queue, controller)
+    window = MainWindow(args, controller)
     
     writer.register_window(window)
     controller.register_window(window)
@@ -480,7 +480,7 @@ def main():
 
     try:
         print("[info] Waiting for sensor ...")
-        rs_reader = RealsenseReader(args, image_queue, controller)
+        rs_reader = RealsenseReader(args, controller)
         print("[info] Realsense sensor opened.")
     except RealSenseError:
         writer.stop()

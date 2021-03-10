@@ -10,6 +10,13 @@ import threading
 import os
 
 
+__SCRIPT_PATH__, __SCRIPT_NAME__ = os.path.split(__file__)
+
+
+def res(name):
+    return os.path.join(__SCRIPT_PATH__, name)
+
+
 class MainWindow(QtWidgets.QDialog):
 
     signal_queue_size = QtCore.pyqtSignal(int, name="queue_size")
@@ -60,7 +67,7 @@ class MainWindow(QtWidgets.QDialog):
         font.setPointSize(18)
 
         right_column_x = 320 * 2 + margin
-
+    
         self.status = QtWidgets.QLabel(self)
         self.status.setGeometry(right_column_x,20,250,30)
         self.status.setText('Idle')
@@ -122,6 +129,19 @@ class MainWindow(QtWidgets.QDialog):
         self.btn_cancel.setGeometry(QtCore.QRect(button_x + column_width, button_group_y + row_height * 2, button_width, 60))
         self.btn_cancel.setFont(font)
         self.btn_cancel.clicked.connect(self.btn_cancel_click)
+        
+        self.recording_indicator = QtWidgets.QLabel(self)
+        self.recording_indicator.setObjectName("recording_indicator")
+        self.recording_indicator.setGeometry((320-256)//2, (480-64)//2, 256, 64)
+        self.recording_indicator.setPixmap(QtGui.QPixmap.fromImage(color_frame))
+        self.recording_indicator.setIcon(QtGui.QIcon(res("recording.svg")))
+        self.recording_indicator.hide()
+        self.recording_indicator.setStyleSheet(
+            "QPushButton#recording_indicator{"
+            "   border-width: 0px;"
+            "   border-style: none;"
+            "   background-color: none;"
+            "}")
 
         if not self.args.master:
             self.btn_action_plus.hide()
@@ -178,9 +198,11 @@ class MainWindow(QtWidgets.QDialog):
     def update_status(self):
         if self.controller.is_recording:
             self.status.setText('Recording')
+            self.recording_indicator.show()
         else:
             self.status.setText('Idle')
-
+            self.recording_indicator.hide()
+            
     def btn_cancel_click(self):
         if not self.controller.is_recording:
             return

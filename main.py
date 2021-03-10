@@ -356,18 +356,18 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
         writeInfo = WriteInfo(self.controller.aid, self.controller.pid)
         
         while self.working:
-        
             rs_color_frame, rs_color_frame_show, rs_depth_frame = self.realsense.get_frame()
-            rs_color_frame_show = cv2.rotate(rs_color_frame_show, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            color_img = QtGui.QImage(rs_color_frame_show.data, rs_color_frame_show.shape[1],rs_color_frame_show.shape[0], QtGui.QImage.Format_RGB888)
-            
-            if self.window:
-                self.window.signal_color_image.emit(color_img)
 
             if self.is_recording:
                 writeInfo.frames_color.append(rs_color_frame.copy())
                 writeInfo.frames_depth.append(rs_depth_frame.copy())
             else:
+                rs_color_frame_show = cv2.rotate(rs_color_frame_show, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                color_img = QtGui.QImage(rs_color_frame_show.data, rs_color_frame_show.shape[1],rs_color_frame_show.shape[0], QtGui.QImage.Format_RGB888)
+
+                if self.window:
+                    self.window.signal_color_image.emit(color_img)
+
                 if self.save_signal:
                     writeInfo.setActionID(self.controller.aid)
                     writeInfo.setPeopleID(self.controller.pid)
@@ -463,7 +463,7 @@ class EventReader(Runnable, ReaderCallback, Readable):
 
     def proc(self):
         while self.working:
-            if self.window:
+            if self.window and not self.is_recording:
                 EVENT_BINARY_PIC = 0
                 img = self.event_dev.getEventPicBuffer(EVENT_BINARY_PIC)
                 img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)

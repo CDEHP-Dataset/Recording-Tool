@@ -130,11 +130,12 @@ class MainWindow(QtWidgets.QDialog):
         self.btn_cancel.setFont(font)
         self.btn_cancel.clicked.connect(self.btn_cancel_click)
         
-        self.recording_indicator = QtWidgets.QLabel(self)
+        self.recording_indicator = QtWidgets.QPushButton(self)
         self.recording_indicator.setObjectName("recording_indicator")
         self.recording_indicator.setGeometry((320-256)//2, (480-64)//2, 256, 64)
-        self.recording_indicator.setPixmap(QtGui.QPixmap.fromImage(color_frame))
         self.recording_indicator.setIcon(QtGui.QIcon(res("recording.svg")))
+        self.recording_indicator.setIconSize(self.recording_indicator.size())
+        
         self.recording_indicator.hide()
         self.recording_indicator.setStyleSheet(
             "QPushButton#recording_indicator{"

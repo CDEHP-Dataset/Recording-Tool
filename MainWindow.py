@@ -1,5 +1,4 @@
 import sys
-from sensor import RealSense
 
 from PyQt5 import QtGui, QtCore
 import PyQt5.QtWidgets as QtWidgets
@@ -25,7 +24,7 @@ class MainWindow(QtWidgets.QDialog):
     signal_color_image = QtCore.pyqtSignal(object, name="color_image")
     signal_event_snapshot = QtCore.pyqtSignal(object, name="event_snapshot")
 
-    def __init__(self, args, controller, parent=None, width=1020, height=480):
+    def __init__(self, args, controller, parent=None):
         super(MainWindow, self).__init__(parent)
         
         self.args = args
@@ -33,9 +32,6 @@ class MainWindow(QtWidgets.QDialog):
         self.controller = controller
 
         self.setWindowTitle('Sign Language Dataset Recorder')
-        self.width = width
-        self.height = height
-        self.setFixedSize(self.width, self.height)
 
         self.initUI()
         
@@ -58,15 +54,28 @@ class MainWindow(QtWidgets.QDialog):
 
     def initUI(self, margin=30):
         self.rs_color_frame = QtWidgets.QLabel(self)
-        self.rs_color_frame.setGeometry(0, 0, 320, 480)
         
         self.event_frame = QtWidgets.QLabel(self)
-        self.event_frame.setGeometry(320, 0, 320, 480)
 
         font = QtGui.QFont()
         font.setPointSize(18)
 
-        right_column_x = 320 * 2 + margin
+        if self.args.layout == "landscape":
+            self.width = 860
+            self.height = 640
+            self.rs_color_frame.setGeometry(0, 0, 480, 320)
+            self.event_frame.setGeometry(0, 320, 480, 320)
+            self.setFixedSize(self.width, self.height)
+
+            right_column_x = 480 + margin
+        else:
+            self.width = 1020
+            self.height = 480
+            self.rs_color_frame.setGeometry(0, 0, 320, 480)
+            self.event_frame.setGeometry(320, 0, 320, 480)
+            self.setFixedSize(self.width, self.height)
+
+            right_column_x = 320 * 2 + margin
     
         self.status = QtWidgets.QLabel(self)
         self.status.setGeometry(right_column_x,20,250,30)
@@ -88,10 +97,10 @@ class MainWindow(QtWidgets.QDialog):
         self.person_state.setText('Current Person = 0')
         self.person_state.setFont(font)
 
-        button_group_y = 250
+        row_height = 80
+        button_group_y = self.height - (3 * row_height) - 20
         button_width = (self.width - right_column_x - 2 * margin) // 2
         column_width = button_width + margin
-        row_height = 80
         button_x = right_column_x
 
         self.btn_action_plus = QtWidgets.QPushButton(self)
@@ -132,7 +141,12 @@ class MainWindow(QtWidgets.QDialog):
         
         self.recording_indicator = QtWidgets.QPushButton(self)
         self.recording_indicator.setObjectName("recording_indicator")
-        self.recording_indicator.setGeometry((320-256)//2, (480-64)//2, 256, 64)
+        indicator_width = 256
+        indicator_height = 64
+        if self.args.layout == "landscape":
+            self.recording_indicator.setGeometry((480-indicator_width)//2, (320*2-indicator_height)//2, indicator_width, indicator_height)
+        else:
+            self.recording_indicator.setGeometry((320*2-indicator_width)//2, (480-indicator_height)//2, indicator_width, indicator_height)
         self.recording_indicator.setIcon(QtGui.QIcon(res("recording.svg")))
         self.recording_indicator.setIconSize(self.recording_indicator.size())
         

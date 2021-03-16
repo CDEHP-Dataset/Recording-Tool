@@ -16,9 +16,33 @@ import socket
 import numpy as np
 import shutil
 
-
 from sensor import RealSense, RealSenseError
 import pyCeleX5 as pycx
+
+
+class Layouts:
+
+    alias = {
+        "portrait": {"p", "v", "vertical"},
+        "landscape": {"l", "h", "horizontal"}
+    }
+
+    def __getitem__(self, item):
+        for k in self.alias:
+            if item.lower() == k:
+                return k
+
+            if item.lower() in self.alias[k]:
+                return k
+
+    def __contains__(self, item):
+        return any((item.lower() == k or item.lower() in self.alias[k]) for k in self.alias)
+
+    def __iter__(self):
+        for k in self.alias:
+            yield k
+            for v in self.alias[k]:
+                yield v
 
 
 def parse_args():
@@ -33,6 +57,9 @@ def parse_args():
     par.add_argument('-s', "--sid", default=0, type=int)
     par.add_argument('-p', "--pid", default=0, type=int)
     
+    layouts = Layouts()
+    par.add_argument('-L', "--layout", default='portrait', choices=layouts, type=lambda x: layouts[x])
+
     return par.parse_args()
 
 
@@ -362,7 +389,9 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
                 writeInfo.frames_color.append(rs_color_frame.copy())
                 writeInfo.frames_depth.append(rs_depth_frame.copy())
             else:
-                rs_color_frame_show = cv2.rotate(rs_color_frame_show, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                if self.args.layout == "portrait":
+                    rs_color_frame_show = cv2.rotate(rs_color_frame_show, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
                 color_img = QtGui.QImage(rs_color_frame_show.data, rs_color_frame_show.shape[1],rs_color_frame_show.shape[0], QtGui.QImage.Format_RGB888)
 
                 if self.window:
@@ -466,8 +495,9 @@ class EventReader(Runnable, ReaderCallback, Readable):
             if self.window and not self.is_recording:
                 EVENT_BINARY_PIC = 0
                 img = self.event_dev.getEventPicBuffer(EVENT_BINARY_PIC)
-                img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-                img = cv2.resize(img, (300, 480))
+                if self.args.layout == "portrait":
+                    img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+                    img = cv2.resize(img, (300, 480))
                 img = np.ascontiguousarray(img[:, ::-1])
                 color_img = QtGui.QImage(img.data, img.shape[1],img.shape[0], QtGui.QImage.Format_Grayscale8)
 
@@ -543,7 +573,7 @@ def main():
     rs_reader.register_window(window)
     rs_reader.start()
     writer.register_readable(rs_reader)
-    
+
     event_reader.register_window(window)
     event_reader.start()
     writer.register_readable(event_reader)

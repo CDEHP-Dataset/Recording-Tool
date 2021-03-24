@@ -498,6 +498,8 @@ class EventReader(Runnable, ReaderCallback, Readable):
                 if self.args.layout == "portrait":
                     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
                     img = cv2.resize(img, (300, 480))
+                else:
+                    img = cv2.resize(img, (480, 300))
                 img = np.ascontiguousarray(img[:, ::-1])
                 color_img = QtGui.QImage(img.data, img.shape[1],img.shape[0], QtGui.QImage.Format_Grayscale8)
 

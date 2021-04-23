@@ -2,12 +2,13 @@ import os
 import queue
 
 import cv2
+from PyQt5 import QtGui
 
-from recorder_controller import RecorderController
-from readable import Readable
+from reader.readable import Readable
+from reader.reader_callback import ReaderCallback
+from reader.runnable import Runnable
 from reader.write_info import WriteInfo
-from reader_callback import ReaderCallback
-from runnable import Runnable
+from recorder_controller import RecorderController
 from sensor import RealSense
 
 

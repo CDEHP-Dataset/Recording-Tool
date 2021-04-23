@@ -1,10 +1,11 @@
-import pyrealsense2 as rs
-import numpy as np
-import cv2
 # from pylibfreenect2 import Freenect2, SyncMultiFrameListener
 # from pylibfreenect2 import FrameType, Registration, Frame
 # from pylibfreenect2 import OpenGLPacketPipeline
 import sys
+
+import cv2
+import numpy as np
+import pyrealsense2 as rs
 
 
 class Sensor:
@@ -15,11 +16,14 @@ class Sensor:
 class RealSenseError(Exception):
     pass
 
+
 class RealSenseDeviceException(RealSenseError):
     pass
 
+
 class RealSenseIOException(RealSenseError):
     pass
+
 
 class RealSense:
     def __init__(self):
@@ -30,7 +34,7 @@ class RealSense:
             # self.pipeline.stop()
             print("FATAL: Failed to open Realsense device.", file=sys.stderr)
             raise RealSenseDeviceException from RuntimeError
-        
+
         try:
             frame = self.pipeline.wait_for_frames()
         except RuntimeError:
@@ -87,10 +91,9 @@ class Kinect:
         device.setIrAndDepthFrameListener(self.listener)
         device.start()
         self.registration = Registration(device.getIrCameraParams(),
-                                device.getColorCameraParams())
+                                         device.getColorCameraParams())
         self.undistorted = Frame(512, 424, 4)
         self.registered = Frame(512, 424, 4)
-
 
     def get_frame(self):
         frames = self.listener.waitForNewFrame()
@@ -100,4 +103,3 @@ class Kinect:
         self.registration.apply(color, depth, self.undistorted, self.registered)
 
         return color
-

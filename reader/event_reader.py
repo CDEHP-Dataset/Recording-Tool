@@ -8,10 +8,11 @@ import numpy
 import pyCeleX5 as pycx
 from PyQt5 import QtGui
 
-from recorder_controller import RecorderController
+import Celex5
 from reader.readable import Readable
 from reader.reader_callback import ReaderCallback
 from reader.runnable import Runnable
+from recorder_controller import RecorderController
 
 
 def random_string(l):
@@ -50,6 +51,11 @@ class EventReader(Runnable, ReaderCallback, Readable):
             return
         print("event_reader notified to recording")
         self.current_record = os.path.join(self.args.path, ".event_stream.{}".format(random_string(5)))
+        self.event_dev.setLoopModeEnabled(True)
+        self.event_dev.setSensorLoopMode(Celex5.CeleX5Mode.Full_Picture_Mode, 1)
+        self.event_dev.setSensorLoopMode(Celex5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode, 2)
+        # self.event_dev.setPictureNumber(1, Celex5.CeleX5Mode.Full_Picture_Mode)
+        # self.event_dev.setEventDuration(20, Celex5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode)
         self.event_dev.startRecording(self.current_record)
         self.is_recording = True
 

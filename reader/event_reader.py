@@ -54,6 +54,7 @@ class EventReader(Runnable, ReaderCallback, Readable):
         self.event_dev.setLoopModeEnabled(True)
         self.event_dev.setSensorLoopMode(Celex5.CeleX5Mode.Full_Picture_Mode, 1)
         self.event_dev.setSensorLoopMode(Celex5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode, 2)
+        self.event_dev.setSensorLoopMode(Celex5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode, 3)
         # self.event_dev.setPictureNumber(1, Celex5.CeleX5Mode.Full_Picture_Mode)
         # self.event_dev.setEventDuration(20, Celex5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode)
         self.event_dev.startRecording(self.current_record)

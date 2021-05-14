@@ -34,6 +34,12 @@ class EventReader(Runnable, ReaderCallback, Readable):
             self.event_dev.openSensor(PyCeleX5.DeviceType.CeleX5_MIPI)
             self.event_dev.setFpnFile("/home/event/Desktop/record_dataset_net/FPN_lab.txt")
             self.event_dev.setRotateType(2)
+            self.event_dev.setSensorLoopMode(PyCeleX5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode, 1)
+            self.event_dev.setSensorLoopMode(PyCeleX5.CeleX5Mode.Full_Picture_Mode, 2)
+            self.event_dev.setSensorLoopMode(PyCeleX5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode, 3)
+            # self.event_dev.setPictureNumber(1, PyCeleX5.CeleX5Mode.Full_Picture_Mode)
+            # self.event_dev.setEventDuration(20, PyCeleX5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode)
+            self.event_dev.setLoopModeEnabled(True)
         except Exception:
             raise EventCameraError
 
@@ -53,12 +59,6 @@ class EventReader(Runnable, ReaderCallback, Readable):
             return
         print("event_reader notified to recording")
         self.current_record = os.path.join(self.args.path, ".event_stream.{}".format(random_string(5)))
-        self.event_dev.setLoopModeEnabled(True)
-        self.event_dev.setSensorLoopMode(PyCeleX5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode, 1)
-        self.event_dev.setSensorLoopMode(PyCeleX5.CeleX5Mode.Full_Picture_Mode, 2)
-        self.event_dev.setSensorLoopMode(PyCeleX5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode, 3)
-        # self.event_dev.setPictureNumber(1, PyCeleX5.CeleX5Mode.Full_Picture_Mode)
-        # self.event_dev.setEventDuration(20, PyCeleX5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode)
         self.event_dev.startRecording(self.current_record)
         self.is_recording = True
 

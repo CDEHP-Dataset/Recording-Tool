@@ -78,15 +78,15 @@ class RecorderController(Runnable):
                 if ctrl is None:
                     continue
 
-                if ctrl == 'update':
-                    self.aid = command.get('aid', 0)
-                    self.pid = command.get('pid', 0)
-                    self.sid = command.get('sid', 0)
-                elif ctrl == 'record':
+                if ctrl == "update":
+                    self.aid = command.get("aid", 0)
+                    self.pid = command.get("pid", 0)
+                    self.sid = command.get("sid", 0)
+                elif ctrl == "record":
                     self.set_record()
-                elif ctrl == 'stop':
+                elif ctrl == "stop":
                     self.set_stop()
-                elif ctrl == 'cancel':
+                elif ctrl == "cancel":
                     self.set_cancel()
             except socket.timeout:
                 continue

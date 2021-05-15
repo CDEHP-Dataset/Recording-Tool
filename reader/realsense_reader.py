@@ -2,6 +2,7 @@ import os
 import queue
 
 import cv2
+import numpy
 from PyQt5 import QtGui
 
 from reader.readable import Readable
@@ -90,10 +91,14 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
         print("realsense reader: returning save job:", len(job.frames_color), len(job.frames_depth))
         return [
             ("color", self.save_data, job.frames_color),
-            ("depth", self.save_data, job.frames_depth)
+            ("depth", self.save_data, job.frames_depth),
+            ("depth_raw", self.save_data, job.frames_depth)
         ]
 
     def save_data(self, modal_path, modal_data):
         print("realsense reader: saving job ...", modal_path)
         for i in range(len(modal_data)):
-            cv2.imwrite(os.path.join(modal_path, '{:06d}.png'.format(i)), modal_data[i])
+            if modal_path.endswith("depth_raw"):
+                numpy.save(os.path.join(modal_path, "{:06d}".format(i)), modal_data[i])
+            else:
+                cv2.imwrite(os.path.join(modal_path, "{:06d}.png".format(i)), modal_data[i])

@@ -26,23 +26,23 @@ class MainWindow(QtWidgets.QDialog):
 
     def __init__(self, args, controller, parent=None):
         super(MainWindow, self).__init__(parent)
-        
+
         self.args = args
-        
+
         self.controller = controller
 
-        self.setWindowTitle('Sign Language Dataset Recorder')
+        self.setWindowTitle("Sign Language Dataset Recorder")
 
         self.initUI()
-        
+
         self.sig_queue_size = QtCore.pyqtSignal(int)
         self.signal_queue_size.connect(self.display_log)
-        
+
         self.signal_id_update.connect(self.update_ids)
         self.signal_color_image.connect(self.display_realsense)
         self.signal_event_snapshot.connect(self.display_eventstream)
         self.signal_status_update.connect(self.update_status)
-        
+
     def display_realsense(self, color_frame):
         self.rs_color_frame.setPixmap(QtGui.QPixmap.fromImage(color_frame))
 
@@ -50,11 +50,11 @@ class MainWindow(QtWidgets.QDialog):
         self.event_frame.setPixmap(QtGui.QPixmap.fromImage(event_frame))
 
     def display_log(self, size):
-        self.queue_state.setText('Write Queue Size = {}'.format(size))
+        self.queue_state.setText("Write Queue Size = {}".format(size))
 
     def initUI(self, margin=30):
         self.rs_color_frame = QtWidgets.QLabel(self)
-        
+
         self.event_frame = QtWidgets.QLabel(self)
 
         font = QtGui.QFont()
@@ -76,25 +76,25 @@ class MainWindow(QtWidgets.QDialog):
             self.setFixedSize(self.width, self.height)
 
             right_column_x = 320 * 2 + margin
-    
+
         self.status = QtWidgets.QLabel(self)
         self.status.setGeometry(right_column_x,20,250,30)
-        self.status.setText('Idle')
+        self.status.setText("Idle")
         self.status.setFont(font)
 
         self.queue_state = QtWidgets.QLabel(self)
         self.queue_state.setGeometry(right_column_x,60,300,30)
-        self.queue_state.setText('Write Queue Size = 0')
+        self.queue_state.setText("Write Queue Size = 0")
         self.queue_state.setFont(font)
 
         self.action_state = QtWidgets.QLabel(self)
         self.action_state.setGeometry(right_column_x,100,250,30)
-        self.action_state.setText('Current Action = 0')
+        self.action_state.setText("Current Action = 0")
         self.action_state.setFont(font)
 
         self.person_state = QtWidgets.QLabel(self)
         self.person_state.setGeometry(right_column_x,140,250,30)
-        self.person_state.setText('Current Person = 0')
+        self.person_state.setText("Current Person = 0")
         self.person_state.setFont(font)
 
         row_height = 80
@@ -104,41 +104,41 @@ class MainWindow(QtWidgets.QDialog):
         button_x = right_column_x
 
         self.btn_action_plus = QtWidgets.QPushButton(self)
-        self.btn_action_plus.setText('A ++')
+        self.btn_action_plus.setText("A ++")
         self.btn_action_plus.setGeometry(button_x + column_width, button_group_y, button_width, 60)
         self.btn_action_plus.setFont(font)
         self.btn_action_plus.clicked.connect(self.btn_action_plus_click)
 
         self.btn_action_sub = QtWidgets.QPushButton(self)
-        self.btn_action_sub.setText('A --')
+        self.btn_action_sub.setText("A --")
         self.btn_action_sub.setGeometry(button_x, button_group_y, button_width, 60)
         self.btn_action_sub.setFont(font)
         self.btn_action_sub.clicked.connect(self.btn_action_sub_click)
 
         self.btn_person_plus = QtWidgets.QPushButton(self)
-        self.btn_person_plus.setText('P ++')
+        self.btn_person_plus.setText("P ++")
         self.btn_person_plus.setGeometry(button_x + column_width, button_group_y + row_height, button_width, 60)
         self.btn_person_plus.setFont(font)
         self.btn_person_plus.clicked.connect(self.btn_person_plus_click)
 
         self.btn_person_sub = QtWidgets.QPushButton(self)
-        self.btn_person_sub.setText('P --')
+        self.btn_person_sub.setText("P --")
         self.btn_person_sub.setGeometry(button_x, button_group_y + row_height, button_width, 60)
         self.btn_person_sub.setFont(font)
         self.btn_person_sub.clicked.connect(self.btn_person_sub_click)
 
         self.btn_record = QtWidgets.QPushButton(self)
-        self.btn_record.setText('Record')
+        self.btn_record.setText("Record")
         self.btn_record.setGeometry(button_x, button_group_y + row_height * 2, button_width, 60)
         self.btn_record.setFont(font)
         self.btn_record.clicked.connect(self.btn_record_click)
 
         self.btn_cancel = QtWidgets.QPushButton(self)
-        self.btn_cancel.setText('Cancel')
+        self.btn_cancel.setText("Cancel")
         self.btn_cancel.setGeometry(QtCore.QRect(button_x + column_width, button_group_y + row_height * 2, button_width, 60))
         self.btn_cancel.setFont(font)
         self.btn_cancel.clicked.connect(self.btn_cancel_click)
-        
+
         self.recording_indicator = QtWidgets.QPushButton(self)
         self.recording_indicator.setObjectName("recording_indicator")
         indicator_width = 256
@@ -149,7 +149,7 @@ class MainWindow(QtWidgets.QDialog):
             self.recording_indicator.setGeometry((320*2-indicator_width)//2, (480-indicator_height)//2, indicator_width, indicator_height)
         self.recording_indicator.setIcon(QtGui.QIcon(res("recording.svg")))
         self.recording_indicator.setIconSize(self.recording_indicator.size())
-        
+
         self.recording_indicator.hide()
         self.recording_indicator.setStyleSheet(
             "QPushButton#recording_indicator{"
@@ -171,60 +171,60 @@ class MainWindow(QtWidgets.QDialog):
             return
 
         self.controller.aid -= 1
-        self.action_state.setText('Current Action = {}'.format(self.controller.aid))
+        self.action_state.setText("Current Action = {}".format(self.controller.aid))
 
     def btn_action_plus_click(self):
         if self.controller.is_recording:
             return
 
         self.controller.aid += 1
-        self.action_state.setText('Current Action = {}'.format(self.controller.aid))
+        self.action_state.setText("Current Action = {}".format(self.controller.aid))
 
     def btn_person_sub_click(self):
         if self.controller.pid < 1 or self.controller.is_recording:
             return
 
         self.controller.pid -= 1
-        self.person_state.setText('Current Person = {}'.format(self.controller.pid))
+        self.person_state.setText("Current Person = {}".format(self.controller.pid))
 
     def btn_person_plus_click(self):
         if self.controller.is_recording:
             return
-            
+
         self.controller.pid += 1
-        self.person_state.setText('Current Person = {}'.format(self.controller.pid))
+        self.person_state.setText("Current Person = {}".format(self.controller.pid))
 
     def btn_record_click(self):
         if self.controller.is_recording:
             print("=" * 20, "save button clicked")
             self.controller.set_stop()
-            self.status.setText('Idle')
-            self.btn_record.setText('Record')
+            self.status.setText("Idle")
+            self.btn_record.setText("Record")
         else:
             print("=" * 20, "record button clicked")
             self.controller.set_record()
-            self.status.setText('Recording')
-            self.btn_record.setText('Save')
+            self.status.setText("Recording")
+            self.btn_record.setText("Save")
 
     def update_ids(self):
-        self.action_state.setText('Current Action = {}'.format(self.controller.aid))
-        self.person_state.setText('Current Person = {}'.format(self.controller.pid))
-    
+        self.action_state.setText("Current Action = {}".format(self.controller.aid))
+        self.person_state.setText("Current Person = {}".format(self.controller.pid))
+
     def update_status(self):
         if self.controller.is_recording:
-            self.status.setText('Recording')
+            self.status.setText("Recording")
             self.recording_indicator.show()
         else:
-            self.status.setText('Idle')
+            self.status.setText("Idle")
             self.recording_indicator.hide()
-            
+
     def btn_cancel_click(self):
         if not self.controller.is_recording:
             return
         print("=" * 20, "cancel button clicked")
         self.controller.set_cancel()
-        self.status.setText('Idle')
-        self.btn_record.setText('Record')
+        self.status.setText("Idle")
+        self.btn_record.setText("Record")
 
 
 

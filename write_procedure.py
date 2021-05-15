@@ -46,7 +46,7 @@ class WriteProcedure(Runnable, ReaderCallback):
             os.makedirs(path_write, exist_ok=True)
 
             root_path, sub_dirs, sub_files = next(os.walk(path_write))
-            path_write = os.path.join(path_write, 'S{:02d}'.format(len(sub_dirs)))
+            path_write = os.path.join(path_write, "S{:02d}".format(len(sub_dirs)))
 
             print("number of modals:", len(multi_modal_stream))
 

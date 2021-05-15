@@ -38,19 +38,19 @@ class Layouts:
 
 
 def parse_args():
-    par = argparse.ArgumentParser('dataset capture tool')
-    par.add_argument('--path', default='./dataset', help='the work folder for storing results')
+    par = argparse.ArgumentParser("dataset capture tool")
+    par.add_argument("--path", default="./dataset", help="the work folder for storing results")
 
-    par.add_argument('-M', '--master', action='store_true', help='start the datset capture tool as master.')
-    par.add_argument('--broadcast-addr', default='10.12.41.255', help='the broadcast address for network sync.')
-    par.add_argument('--port', type=int, default=30728, help='communication port number for network sync.')
+    par.add_argument("-M", "--master", action="store_true", help="start the datset capture tool as master.")
+    par.add_argument("--broadcast-addr", default="10.12.41.255", help="the broadcast address for network sync.")
+    par.add_argument("--port", type=int, default=30728, help="communication port number for network sync.")
 
-    par.add_argument('-a', "--aid", default=0, type=int)
-    par.add_argument('-s', "--sid", default=0, type=int)
-    par.add_argument('-p', "--pid", default=0, type=int)
+    par.add_argument("-a", "--aid", default=0, type=int)
+    par.add_argument("-s", "--sid", default=0, type=int)
+    par.add_argument("-p", "--pid", default=0, type=int)
 
     layouts = Layouts()
-    par.add_argument('-L', "--layout", default='portrait', choices=layouts, type=lambda x: layouts[x])
+    par.add_argument("-L", "--layout", default="portrait", choices=layouts, type=lambda x: layouts[x])
 
     return par.parse_args()
 
@@ -64,7 +64,7 @@ def main():
         os.makedirs(path_base)
 
     if not os.path.isdir(path_base):
-        print('Path is invalid')
+        print("Path is invalid")
         sys.exit()
 
     image_queue = queue.Queue()
@@ -132,5 +132,5 @@ def main():
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

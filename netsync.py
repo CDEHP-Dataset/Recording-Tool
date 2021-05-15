@@ -24,7 +24,7 @@ SOF_TIMESTAMPING_OPT_TSONLY = (1 << 11)
 
 def parse_args():
     par = argparse.ArgumentParser()
-    par.add_argument("--host", default=False, action='store_true', help="run as host node.")
+    par.add_argument("--host", default=False, action="store_true", help="run as host node.")
     par.add_argument("-p", "--port", default=30728, type=int)
 
     par.add_argument("-b", "--broadcast-addr", default="10.12.41.255", help="broadcast address")
@@ -43,7 +43,7 @@ class SyncServer:
         self.sock.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPNS, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPING, SOF_TIMESTAMPING_RX_HARDWARE | SOF_TIMESTAMPING_TX_HARDWARE | SOF_TIMESTAMPING_RAW_HARDWARE)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        self.sock.bind(('0.0.0.0', self.args.port))
+        self.sock.bind(("0.0.0.0", self.args.port))
 
         self.pid = 0  # person id
         self.aid = 0  # action id

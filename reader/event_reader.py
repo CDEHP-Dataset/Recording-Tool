@@ -98,8 +98,8 @@ class EventReader(Runnable, ReaderCallback, Readable):
                 if self.args.layout == "portrait":
                     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
                 img = numpy.ascontiguousarray(img[:, ::-1])
-                color_img = QtGui.QImage(img.data, img.shape[1], img.shape[0], QtGui.QImage.Format_Grayscale8)
-                self.window.signal_event_snapshot.emit(color_img)
+                img_show = QtGui.QImage(img.data, img.shape[1], img.shape[0], QtGui.QImage.Format_Grayscale8)
+                self.window.signal_event_snapshot.emit(img_show)
             time.sleep(0.01)
 
     def poll(self):

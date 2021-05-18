@@ -93,7 +93,7 @@ class EventReader(Runnable, ReaderCallback, Readable):
     def proc(self):
         while self.working:
             if self.window and not self.is_recording:
-                img = self.device.getEventPicBuffer(PyCeleX5.EventPicType.EventBinaryPic)
+                img = self.device.getEventPicBuffer(PyCeleX5.EventPicType.EventDenoisedBinaryPic)
                 img = cv2.resize(img, (480, 300))
                 if self.args.layout == "portrait":
                     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)

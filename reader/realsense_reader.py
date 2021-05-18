@@ -26,8 +26,8 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
         try:
             self.device = rs.pipeline()
             config = rs.config()
-            config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
             config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+            config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
             self.profile = self.device.start(config)
             self.align = rs.align(rs.stream.color)
             self.device.wait_for_frames()

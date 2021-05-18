@@ -1,6 +1,3 @@
-# from pylibfreenect2 import Freenect2, SyncMultiFrameListener
-# from pylibfreenect2 import FrameType, Registration, Frame
-# from pylibfreenect2 import OpenGLPacketPipeline
 import sys
 
 import cv2

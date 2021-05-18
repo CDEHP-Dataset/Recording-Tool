@@ -3,16 +3,14 @@
 
 import argparse
 import os
-import queue
 import sys
 
 from PyQt5.QtWidgets import QApplication
 
 from MainWindow import MainWindow
 from reader.event_reader import EventReader, EventCameraError
-from reader.realsense_reader import RealsenseReader
+from reader.realsense_reader import RealsenseReader, RealSenseError
 from recorder_controller import RecorderController
-from sensor import RealSenseError
 from write_procedure import WriteProcedure
 
 
@@ -70,7 +68,6 @@ def main():
         print("Path is invalid")
         sys.exit()
 
-    image_queue = queue.Queue()
     controller = RecorderController(args)
 
     if not args.master:
@@ -121,7 +118,6 @@ def main():
             app.processEvents()
 
             if not window.isVisible():
-                # Window closed.
                 break
 
         except KeyboardInterrupt:

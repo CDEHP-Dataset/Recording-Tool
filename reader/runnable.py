@@ -11,7 +11,6 @@ class Runnable(metaclass=abc.ABCMeta):
     def start(self):
         if self.working or self.worker is not None:
             return
-
         self.working = True
         self.worker = threading.Thread(target=self.proc)
         self.worker.start()
@@ -19,7 +18,6 @@ class Runnable(metaclass=abc.ABCMeta):
     def stop(self):
         if not self.working or self.worker is None:
             return
-
         self.working = False
         self.worker.join()
         self.worker = None

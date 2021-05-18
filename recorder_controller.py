@@ -1,3 +1,5 @@
+import socket
+
 import netsync
 from reader.runnable import Runnable
 
@@ -5,23 +7,19 @@ from reader.runnable import Runnable
 class RecorderController(Runnable):
     def __init__(self, args):
         super(RecorderController, self).__init__(args)
-
         self.is_recording = False
-
         self._aid = 0
         self._pid = 0
         self._sid = 0
-
         if self.args.master:
             self.network_controller = netsync.SyncServer(self.args)
         else:
             self.network_controller = netsync.SyncClient(self.args)
-
         self.window = None
         self.readers = []
 
-    def register_window(self, w):
-        self.window = w
+    def register_window(self, window):
+        self.window = window
 
     def register_reader(self, reader):
         self.readers.append(reader)

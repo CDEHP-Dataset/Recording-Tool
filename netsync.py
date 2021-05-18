@@ -1,10 +1,8 @@
 import argparse
+import json
 import socket
 import struct
 import time
-import json
-import threading
-
 
 SO_TIMESTAMPING = 37
 SO_TIMESTAMPNS = 35
@@ -41,7 +39,8 @@ class SyncServer:
 
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPNS, 1)
-        self.sock.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPING, SOF_TIMESTAMPING_RX_HARDWARE | SOF_TIMESTAMPING_TX_HARDWARE | SOF_TIMESTAMPING_RAW_HARDWARE)
+        self.sock.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPING,
+                             SOF_TIMESTAMPING_RX_HARDWARE | SOF_TIMESTAMPING_TX_HARDWARE | SOF_TIMESTAMPING_RAW_HARDWARE)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.sock.bind(("0.0.0.0", self.args.port))
 
@@ -108,7 +107,8 @@ class SyncClient:
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
         self.conn.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPNS, 1)
-        self.conn.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPING, SOF_TIMESTAMPING_RX_HARDWARE | SOF_TIMESTAMPING_RAW_HARDWARE | SOF_TIMESTAMPING_SYS_HARDWARE | SOF_TIMESTAMPING_SOFTWARE)
+        self.conn.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPING,
+                             SOF_TIMESTAMPING_RX_HARDWARE | SOF_TIMESTAMPING_RAW_HARDWARE | SOF_TIMESTAMPING_SYS_HARDWARE | SOF_TIMESTAMPING_SOFTWARE)
         self.conn.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.conn.settimeout(0.1)
         self.conn.bind(("0.0.0.0", self.args.port))
@@ -157,6 +157,7 @@ class SyncClient:
 
         raise socket.timeout
 
+
 def proc_server(args):
     s = SyncServer(args)
     x = 0
@@ -171,6 +172,7 @@ def proc_server(args):
         else:
             s.notify_cancel()
         x += 1
+
 
 def proc_client(args):
     c = SyncClient(args)
@@ -191,4 +193,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

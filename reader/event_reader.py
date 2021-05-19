@@ -38,9 +38,10 @@ class EventReader(Runnable, ReaderCallback, Readable):
             self.device.getThreshold()
             self.device.getBrightness()
             self.device.getEventDataFormat()
-            self.device.setRotateType(2)
 
-            self.device.setThreshold(70)
+            # self.device.setRotateType(2)
+            # self.device.enableFrameDenoising()
+            # self.device.setThreshold(70)
             self.device.setSensorFixedMode(PyCeleX5.CeleX5Mode.Event_Off_Pixel_Timestamp_Mode)
 
             # self.event_dev.setPictureNumber(1, PyCeleX5.CeleX5Mode.Full_Picture_Mode)
@@ -77,7 +78,7 @@ class EventReader(Runnable, ReaderCallback, Readable):
         print("EventReader: notified to saving")
         self.is_recording = False
         self.device.stopRecording()
-        self.queue.put(("event_stream", self.save_data, (self.current_record,)))
+        self.queue.put(("event", self.save_data, (self.current_record,)))
         self.current_record = None
 
     def notify_cancel(self):
@@ -111,4 +112,7 @@ class EventReader(Runnable, ReaderCallback, Readable):
 
     def save_data(self, modal_path, modal_data):
         print("EventReader: saving job ...", modal_path)
-        shutil.move(modal_data[0], os.path.join(modal_path, "EventStream.bin"))
+        action = modal_path[-20:-15]
+        person = modal_path[-15:-10]
+        stream = modal_path[-9:-6]
+        shutil.move(modal_data[0], os.path.join(modal_path, "{}_{}_{}.bin", format(action, person, stream)))

@@ -1,13 +1,7 @@
-import sys
-
-from PyQt5 import QtGui, QtCore
-import PyQt5.QtWidgets as QtWidgets
-from PyQt5.QtWidgets import QApplication
-
-import time
-import threading
 import os
 
+import PyQt5.QtWidgets as QtWidgets
+from PyQt5 import QtGui, QtCore
 
 __SCRIPT_PATH__, __SCRIPT_NAME__ = os.path.split(__file__)
 
@@ -17,7 +11,6 @@ def res(name):
 
 
 class MainWindow(QtWidgets.QDialog):
-
     signal_queue_size = QtCore.pyqtSignal(int, name="queue_size")
     signal_id_update = QtCore.pyqtSignal(name="id_update")
     signal_status_update = QtCore.pyqtSignal(name="status_update")
@@ -63,37 +56,37 @@ class MainWindow(QtWidgets.QDialog):
         if self.args.layout == "landscape":
             self.width = 860
             self.height = 640
-            self.rs_color_frame.setGeometry(0, 0, 480, 320)
-            self.event_frame.setGeometry(0, 320, 480, 320)
+            self.rs_color_frame.setGeometry(0, 0, 480, 270)
+            self.event_frame.setGeometry(0, 320, 480, 300)
             self.setFixedSize(self.width, self.height)
 
             right_column_x = 480 + margin
         else:
             self.width = 1020
             self.height = 480
-            self.rs_color_frame.setGeometry(0, 0, 320, 480)
-            self.event_frame.setGeometry(320, 0, 320, 480)
+            self.rs_color_frame.setGeometry(0, 0, 270, 480)
+            self.event_frame.setGeometry(320, 0, 300, 480)
             self.setFixedSize(self.width, self.height)
 
             right_column_x = 320 * 2 + margin
 
         self.status = QtWidgets.QLabel(self)
-        self.status.setGeometry(right_column_x,20,250,30)
+        self.status.setGeometry(right_column_x, 20, 250, 30)
         self.status.setText("Idle")
         self.status.setFont(font)
 
         self.queue_state = QtWidgets.QLabel(self)
-        self.queue_state.setGeometry(right_column_x,60,300,30)
+        self.queue_state.setGeometry(right_column_x, 60, 300, 30)
         self.queue_state.setText("Write Queue Size = 0")
         self.queue_state.setFont(font)
 
         self.action_state = QtWidgets.QLabel(self)
-        self.action_state.setGeometry(right_column_x,100,250,30)
+        self.action_state.setGeometry(right_column_x, 100, 250, 30)
         self.action_state.setText("Current Action = 0")
         self.action_state.setFont(font)
 
         self.person_state = QtWidgets.QLabel(self)
-        self.person_state.setGeometry(right_column_x,140,250,30)
+        self.person_state.setGeometry(right_column_x, 140, 250, 30)
         self.person_state.setText("Current Person = 0")
         self.person_state.setFont(font)
 
@@ -135,7 +128,8 @@ class MainWindow(QtWidgets.QDialog):
 
         self.btn_cancel = QtWidgets.QPushButton(self)
         self.btn_cancel.setText("Cancel")
-        self.btn_cancel.setGeometry(QtCore.QRect(button_x + column_width, button_group_y + row_height * 2, button_width, 60))
+        self.btn_cancel.setGeometry(
+            QtCore.QRect(button_x + column_width, button_group_y + row_height * 2, button_width, 60))
         self.btn_cancel.setFont(font)
         self.btn_cancel.clicked.connect(self.btn_cancel_click)
 
@@ -144,9 +138,11 @@ class MainWindow(QtWidgets.QDialog):
         indicator_width = 256
         indicator_height = 64
         if self.args.layout == "landscape":
-            self.recording_indicator.setGeometry((480-indicator_width)//2, (320*2-indicator_height)//2, indicator_width, indicator_height)
+            self.recording_indicator.setGeometry((480 - indicator_width) // 2, (320 * 2 - indicator_height) // 2,
+                                                 indicator_width, indicator_height)
         else:
-            self.recording_indicator.setGeometry((320*2-indicator_width)//2, (480-indicator_height)//2, indicator_width, indicator_height)
+            self.recording_indicator.setGeometry((320 * 2 - indicator_width) // 2, (480 - indicator_height) // 2,
+                                                 indicator_width, indicator_height)
         self.recording_indicator.setIcon(QtGui.QIcon(res("recording.svg")))
         self.recording_indicator.setIconSize(self.recording_indicator.size())
 
@@ -225,6 +221,3 @@ class MainWindow(QtWidgets.QDialog):
         self.controller.set_cancel()
         self.status.setText("Idle")
         self.btn_record.setText("Record")
-
-
-

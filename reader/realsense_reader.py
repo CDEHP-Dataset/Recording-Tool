@@ -79,9 +79,9 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
                     break
 
             color_image = np.asanyarray(color_frame.get_data())
-            color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
-            img_show = cv2.resize(color_image, (480, 270))
             depth_image = np.asanyarray(depth_frame.get_data())
+            # color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+            img_show = cv2.resize(color_image, (480, 270))
 
             if self.is_recording:
                 write_info.frames_color.append(color_image.copy())
@@ -91,12 +91,12 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
                     img_show = cv2.rotate(img_show, cv2.ROTATE_90_COUNTERCLOCKWISE)
                 if self.window:
                     img_show = QtGui.QImage(img_show.data, img_show.shape[1],
-                                            img_show.shape[0], QtGui.QImage.Format_RGB888)
+                                            img_show.shape[0], QtGui.QImage.Format_BGR888)
                     self.window.signal_color_image.emit(img_show)
                 if self.save_signal:
+                    print("RealsenseReader: a writeInfo is pushed into image_queue")
                     write_info.set_action_id(self.controller.aid)
                     write_info.set_person_id(self.controller.pid)
-                    print("RealsenseReader: a writeInfo is pushed into image_queue")
                     self.queue.put(write_info)
                     if self.window:
                         self.window.signal_queue_size.emit(self.queue.qsize())

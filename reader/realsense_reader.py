@@ -24,11 +24,15 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
         self.controller = controller
         self.queue = queue.Queue()
         try:
-            self.device = rs.pipeline()
             config = rs.config()
-            config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-            config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
-            self.profile = self.device.start(config)
+            config.enable_stream(rs.stream.color, 848, 480, rs.format.bgr8, 60)
+            config.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 60)
+            self.device = rs.pipeline()
+            profile = self.device.start(config)
+            device = profile.get_device()
+            color_sensor = device.query_sensors()[1]
+            color_sensor.set_option(rs.option.enable_auto_exposure, False)
+            color_sensor.set_option(rs.option.exposure, 156)
             self.align = rs.align(rs.stream.color)
             self.device.wait_for_frames()
         except RuntimeError:

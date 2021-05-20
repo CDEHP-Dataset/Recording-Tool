@@ -115,4 +115,4 @@ class EventReader(Runnable, ReaderCallback, Readable):
         action = modal_path[-20:-15]
         person = modal_path[-15:-10]
         stream = modal_path[-9:-6]
-        shutil.move(modal_data[0], os.path.join(modal_path, "{}_{}_{}.bin", format(action, person, stream)))
+        shutil.move(modal_data[0], os.path.join(modal_path, "{}_{}_{}.bin".format(action, person, stream)))

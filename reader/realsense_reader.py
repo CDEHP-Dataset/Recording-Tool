@@ -32,6 +32,7 @@ class RealsenseReader(Runnable, ReaderCallback, Readable):
             device = profile.get_device()
             color_sensor = device.query_sensors()[1]
             color_sensor.set_option(rs.option.enable_auto_exposure, False)
+            # 156 78 39 19 9 4 2 1
             color_sensor.set_option(rs.option.exposure, 156)
             self.align = rs.align(rs.stream.color)
             self.device.wait_for_frames()
